@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-const lines = readFileSync("day??.txt", { encoding: "utf-8" })
+const lines = readFileSync(".\\Puzzles\\Day-xx\\dayx.txt", { encoding: "utf-8" })
   .replace(/\r/g, "")
   .trim()
   .split("\n") 
