@@ -1,60 +1,61 @@
-class Bridge:
-  def __init__(self, filename, knot_count=2):
+class CRT:
+  @classmethod
+  def parse_instructions(cls, lines):
+    return list([parsed for line in lines.splitlines() if (parsed := CRT._parse(line))])
+
+  @classmethod
+  def _parse(cls, line):
+    parsed = line.split()
+    match len(parsed):
+      case 2:
+        return [parsed[0], int(parsed[1])]
+      case 1:
+        return parsed
+      case _:
+        return []
+
+  @classmethod
+  def perform_instructions_with_register(cls, register, instructions):
+    for instruction in instructions:
+      match instruction[0]:
+        case 'noop':
+          register.append(register[-1])
+        case 'addx':
+          register.append(register[-1])
+          register.append(register[-1] + instruction[1])
+    return register
+
+  def __init__(self, filename):
     with open(filename) as file:
       self.data = file.read()
-    self.motions = list([{ 'direction': pair[0], 'steps': int(pair[1]) } for line in self.data.splitlines() if len(pair := line.split()) == 2])
-    self.positions = list([[(0,0)] for _ in range(0, knot_count)])
-    self.head_positions = self.positions[0]
-    self.tail_positions = self.positions[-1]
-    self.perform_moves()
+    self.registers = { 'X': [1] }
+    self.instructions = CRT.parse_instructions(self.data)
+    self.screen = [['.'] * 40 for _ in range(0, 6)]
 
-  def perform_moves(self):
-    for motion in self.motions:
-      self._perform_move(**motion)
+  def perform_instructions(self):
+    self.registers['X'] = CRT.perform_instructions_with_register(self.registers['X'], self.instructions)
+  
+  def signal_strengths(self, start=20, step=40):
+    if len(self.registers['X']) == 1:
+      self.perform_instructions()
+    return list([(i + 1) * self.registers['X'][i] for i in range(start - 1, len(self.registers['X']), step)])
 
-  @property
-  def tail_positions_count(self):
-    return len(set(self.tail_positions))
-
-  def _perform_move(self, direction, steps):
-    if (steps == 1):
-      self.positions[0].append(self._move(self.positions[0][-1], direction))
-      for i in range(1, len(self.positions)):
-        self.positions[i].append(self._suggest(self.positions[i - 1][-1], self.positions[i][-1]))
-    else:  
-      for _ in range(0, steps):
-        self._perform_move(direction, 1)
-
-  def _move(self, position, direction):
-    match direction:
-      case 'U':
-        return (position[0], position[1] + 1)
-      case 'D':
-        return (position[0], position[1] - 1)
-      case 'L':
-        return (position[0] - 1, position[1])
-      case 'R':
-        return (position[0] + 1, position[1])
-
-  def _suggest(self, leader, follower):
-    suggestion = (follower[0], follower[1])
-    far_enough = abs(leader[0] - follower[0]) > 1 or abs(leader[1] - follower[1]) > 1
-    if leader[0] > follower[0] and far_enough:
-      suggestion = (suggestion[0] + 1, suggestion[1])
-    elif leader[0] < follower[0] and far_enough:
-      suggestion = (suggestion[0] - 1, suggestion[1])
-    if leader[1] > follower[1] and far_enough:
-      suggestion = (suggestion[0], suggestion[1] + 1)
-    elif leader[1] < follower[1] and far_enough:
-      suggestion = (suggestion[0], suggestion[1] - 1)
-    return suggestion
+  def render_screen(self):
+    if len(self.registers['X']) == 1:
+      self.perform_instructions()
+    for i in range(0, 240):
+      row = int(i / 40)
+      column = i - (row * 40)
+      if abs(self.registers['X'][i] - column) <= 1:
+        self.screen[row][column] = '#'
 
 
 def main():
-  bridge = Bridge('./Puzzles/Day-10/day10.txt')
-  print(f'Part 1: {bridge.tail_positions_count}')
-  bridge = Bridge('./Puzzles/Day-10/day10.txt', 10)
-  print(f'Part 2: {bridge.tail_positions_count}')
+  crt = CRT('./Puzzles/Day-10/day10.txt')
+  print(f'Part 1: {sum(crt.signal_strengths())}')
+  crt.render_screen()
+  for i in range(0, 6):
+    print((''.join(crt.screen[i])).replace('.', ' '))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   main()
