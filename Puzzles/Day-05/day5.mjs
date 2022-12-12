@@ -1,8 +1,10 @@
 import { readFileSync } from "node:fs";
 
-const lines = readFileSync(".\\Puzzles\\Day-05\\day5.txt", { encoding: "utf-8" }) // read day??.txt content
-  .replace(/\r/g, "") // remove all \r characters to avoid issues on Windows
-  .trimEnd(); // Remove ending whitespace
+const lines = readFileSync(".\\Puzzles\\Day-05\\day5.txt", {
+  encoding: "utf-8",
+})
+  .replace(/\r/g, "")
+  .trimEnd();
 
 const [rawStacks, rawMoves] = lines.split("\n\n").map((x) => x.split("\n"));
 
@@ -17,7 +19,6 @@ const stacks = {};
 for (const line of parsedStacks) {
   for (let i = 0; i < line.length; i++) {
     if (line[i] !== " ") {
-      // Add line[i] to the stack indexes[i]
       if (!stacks[indexes[i]]) {
         stacks[indexes[i]] = [];
       }
