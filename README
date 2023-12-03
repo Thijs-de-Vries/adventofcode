@@ -1,2 +1,11 @@
-This is my fist year participating in the AOC
-2022
+# Advent of Code Repository
+
+This repository contains my solutions for the Advent of Code challenges.
+
+## About Advent of Code
+
+Advent of Code is an annual coding event that takes place during the month of December. Each day, a new coding puzzle is released, and participants are challenged to solve it using their programming skills.
+
+## Structure
+
+The repository is organized into separate directories for each year. Inside each year's directory, you will find the solutions for each day's puzzle, along with any supporting code or input files.
